@@ -6,7 +6,7 @@
 /*   By: pbernier <pbernier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/01 00:15:50 by pbernier          #+#    #+#             */
-/*   Updated: 2017/08/02 18:23:13 by pbernier         ###   ########.fr       */
+/*   Updated: 2017/08/03 14:13:40 by pbernier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,59 +51,54 @@ void	bresenham(int st[2], int en[2], t_fdf *e)
 	}
 }
 
+void	place_line(t_fdf *e, t_place *l)
+{
+	while (++l->i[0] < e->y_max)
+	{
+		l->i[1] = -1;
+		while (++l->i[1] < e->x_max)
+		{
+			if (l->i[1] + 1 < e->x_max)
+				bresenham((int[2]){l->st[0] + l->i[1] * l->sp - l->rot_v,
+				l->st[1] + l->i[0] * l->sp - e->nb[l->i[0]][l->i[1]] * e->amp +
+				l->rot_h}, (int[2]){l->st[0] + (l->i[1] + 1) * l->sp - l->rot_v,
+				l->st[1] + l->i[0] * l->sp - e->nb[l->i[0]][l->i[1] + 1] *
+				e->amp + (l->rot_h + l->inc)}, e);
+			if (l->i[0] + 1 < e->y_max)
+				bresenham((int[2]){l->st[0] + l->i[1] * l->sp - l->rot_v,
+				l->st[1] + l->i[0] * l->sp - e->nb[l->i[0]][l->i[1]] * e->amp +
+				l->rot_h}, (int[2]){l->st[0] + l->i[1] * l->sp - (l->rot_v +
+				l->inc), l->st[1] + (l->i[0] + 1) * l->sp -
+				e->nb[l->i[0] + 1][l->i[1]] * e->amp + l->rot_h}, e);
+			l->rot_h += l->inc;
+		}
+		l->rot_v += l->inc;
+		l->rot_h = 0;
+	}
+}
+
 void	place_point(t_fdf *e)
 {
 	t_place		l;
 
 	l.rot_h = 0;
 	l.rot_v = 0;
-
 	ft_memcpy(l.i, ((int[2]){-1, -1}), sizeof(int[2]));
-	l.res = (X > Y) ? Y / sqrt(pow(e->y_max, 2) + pow(e->x_max, 2))
-	: X / sqrt(pow(e->y_max, 2) + pow(e->x_max, 2));
-
-	if (e->add >= 3 * l.res)
-		e->add = -l.res;
-	else if (e->add < -l.res)
-		e->add = 3 * l.res;
-
+	if (e->add >= 3 * e->res)
+		e->add = -e->res;
+	else if (e->add <= -e->res)
+		e->add = 3 * e->res;
 	l.inc = (e->add);
-	printf("%f\n", e->add);
-	if (l.res >= l.inc)
-		l.sp = sqrt(pow(l.res, 2) - pow(l.inc, 2));
+	if (e->res >= l.inc)
+		l.sp = sqrt(pow(e->res, 2) - pow(l.inc, 2));
 	else
 	{
-		printf("Ok\n");
-		l.inc -= (l.inc - l.res) * 2;
-		l.sp = -sqrt(pow(l.res, 2) - pow(l.inc, 2));
+		l.inc -= (l.inc - e->res) * 2;
+		l.sp = -sqrt(pow(e->res, 2) - pow(l.inc, 2));
 	}
-
-	printf("inc = [%.1f] | red = [%d] | sp = [%d]\n", l.inc, l.res, l.sp);
-	ft_memcpy(l.st, ((int[2]){(X - (e->x_max * l.sp) + ((e->y_max - 1) * l.inc)) / 2,
-	 						(Y - (e->y_max * l.sp) - ((e->x_max - 1) * l.inc)) / 2}),
-	 						sizeof(int[2]));
-
-
-	while (++l.i[0] < e->y_max)
-	{
-		l.i[1] = -1;
-		while (++l.i[1] < e->x_max)
-		{
-			if (l.i[1] + 1 < e->x_max)
-				bresenham((int[2]){l.st[0] + l.i[1] * l.sp - l.rot_v,           l.st[1] + l.i[0] * l.sp - e->nb[l.i[0]][l.i[1]] * e->amp + l.rot_h},
-
-							(int[2]){l.st[0] + (l.i[1] + 1) * l.sp - l.rot_v, 		l.st[1] + l.i[0] * l.sp - e->nb[l.i[0]][l.i[1] + 1] * e->amp +
-				(l.rot_h + l.inc)}, e);
-
-			if (l.i[0] + 1 < e->y_max)
-				bresenham((int[2]){l.st[0] + l.i[1] * l.sp - l.rot_v, l.st[1] +
-				l.i[0] * l.sp - e->nb[l.i[0]][l.i[1]] * e->amp + l.rot_h},
-				(int[2]){l.st[0] + l.i[1] * l.sp - (l.rot_v + l.inc), l.st[1] +
-				(l.i[0] + 1) * l.sp - e->nb[l.i[0] + 1][l.i[1]] * e->amp +
-				l.rot_h}, e);
-			l.rot_h += l.inc;
-		}
-		l.rot_v += l.inc;
-		l.rot_h = 0;
-	}
+	ft_memcpy(l.st, ((int[2])
+	{(X - (e->x_max * l.sp) + (e->y_max - 1) * l.inc) / 2 + e->ver,
+		(Y - (e->y_max * l.sp) - (e->x_max - 1) * l.inc) / 2 + e->hor}),
+		sizeof(int[2]));
+	place_line(e, &l);
 }

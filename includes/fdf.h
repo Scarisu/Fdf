@@ -6,7 +6,7 @@
 /*   By: pbernier <pbernier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/30 10:01:19 by pbernier          #+#    #+#             */
-/*   Updated: 2017/08/02 13:10:47 by pbernier         ###   ########.fr       */
+/*   Updated: 2017/08/03 14:21:00 by pbernier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ typedef struct		s_place
 	float		inc;
 	int			i[2];
 	int			st[2];
-	int			res;
 	int			sp;
 }					t_place;
 
@@ -66,6 +65,9 @@ typedef struct		s_fdf
 	int				y_max;
 	float			add;
 	float			amp;
+	int				ver;
+	int				hor;
+	int				res;
 	t_color			pix;
 }					t_fdf;
 
